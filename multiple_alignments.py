@@ -196,22 +196,16 @@ def create_dicts(maf_ifn, expanded_coding_regions, chrom):
 
             elif line.strip() == "":  # End of block
                 if cds_idx != -1:   # in cds segment
-                    #print("hi")
                     pos_dict[pos_idx] = [start_pos, end_pos, size, gene_name, cds_idx, subseqs]
                     pos_idx += 1
                 elif in_bounds:     # in bounds but not in cds segment
-                    #print(neg_gene_name)
                     pos_dict[pos_idx] = [start_pos, end_pos, size, gene_name, cds_idx, subseqs]
                     pos_idx += 1
                     if neg_count > set_limit:
-                        # print(len(subseqs))
-                        # print(neg_gene_name)
-                        # input()
                         neg_dict[neg_idx] = [start_pos, end_pos, size, neg_gene_name, cds_idx, subseqs]
                         neg_idx += 1
                 else:               # not in bounds, only negative
                     if skip_neg: continue
-                    #print(neg_gene_name)
                     neg_dict[neg_idx] = [start_pos, end_pos, size, neg_gene_name, cds_idx, subseqs]
                     neg_idx += 1        
 
@@ -235,11 +229,6 @@ def process_pos_dict(pos_dict, expanded_coding_regions, ofn):
                 # 1. Deal with previous gene
                 if curr_gene != '' and curr_cds_idx != 0:
                     gene_dict[curr_gene] = [first_start_pos, last_end_pos, curr_cds_start, curr_cds_idx, concat_subseqs]
-                    #print(first_start_pos, curr_cds_start, curr_cds_idx)
-
-                    #input()
-                    # print(gene_dict[curr_gene])
-                    # input()
 
                 # 2. Deal with new gene
                 first_start_pos = start_pos
@@ -268,7 +257,6 @@ def process_pos_dict(pos_dict, expanded_coding_regions, ofn):
                     max_subseq_len = this_len
             for chrom in concat_subseqs:
                 while len(concat_subseqs[chrom]) < max_subseq_len:
-                    #print(len(concat_subseqs[chrom]), max_subseq_len)
                     concat_subseqs[chrom] = concat_subseqs[chrom] + "N"
 
             last_start_pos = start_pos
@@ -291,7 +279,6 @@ def process_neg_dict(neg_dict, expanded_coding_regions, ofn):
         curr_gene = ''
         for idx in neg_dict:
             start_pos, end_pos, size, gene_name, cds_idx, subseqs = neg_dict[idx]
-            #print(gene_name)
 
             # We are in a new block
             if curr_gene != gene_name:
@@ -299,8 +286,6 @@ def process_neg_dict(neg_dict, expanded_coding_regions, ofn):
                 # 1. Deal with previous gene
                 if curr_gene != '':
                     gene_dict[curr_gene] = [first_start_pos, last_end_pos, concat_subseqs]
-                    # print(gene_dict[curr_gene])
-                    # input()
 
                 # 2. Deal with new gene
                 first_start_pos = start_pos
@@ -322,14 +307,12 @@ def process_neg_dict(neg_dict, expanded_coding_regions, ofn):
                     max_subseq_len = this_len
             for chrom in concat_subseqs:
                 while len(concat_subseqs[chrom]) < max_subseq_len:
-                    #print(len(concat_subseqs[chrom]), max_subseq_len)
                     concat_subseqs[chrom] = concat_subseqs[chrom] + "N"
 
             last_start_pos = start_pos
             last_end_pos = end_pos
             
         for gene_name in gene_dict:
-            #print(gene_name)
             subseqs = gene_dict[gene_name][2]
             for key in subseqs:
                 if "hg38" in key:
@@ -338,29 +321,16 @@ def process_neg_dict(neg_dict, expanded_coding_regions, ofn):
             if "ATG" in query[100:-103]:
                 out.write("* " + gene_name + "\n")
                 out.write("% " + f"{gene_dict[gene_name][0]} {gene_dict[gene_name][1]} \n")
-                #subseqs = gene_dict[gene_name][2]
                 for chrom in subseqs:
                     out.write(subseqs[chrom] + "\n")
                 out.write("\n")
     print("process_neg_dict done")
 
 def get_corrected_idx(text, query, start_pos, idx, start_codon):
-    # search_idx = 0       # relative idx for query 
-    # while query[idx:search_idx+3] != start_codon:
-    #     if text[idx] in "ACTG":
-    #         idx += 1
-    #         search_idx += 1
-    #     else:
-    #         idx += 1
-
     diff = idx - start_pos
     i = 0
     new_idx = start_pos
-    #print(diff)
     while i < diff or text[new_idx] not in "ACTG":
-        # print(text[new_idx:new_idx+100])
-        # print(diff-i)
-        # input()
         if text[new_idx] in "ACTG":
             i += 1
             new_idx += 1
@@ -368,10 +338,6 @@ def get_corrected_idx(text, query, start_pos, idx, start_codon):
             new_idx += 1
     while (text[new_idx] not in "ACTG"): new_idx += 1
 
-    #print(text[new_idx:new_idx+3])
-    #print(query[search_idx:search_idx+3])
-    #input()
-    
     return new_idx
 
 def get_start_codon(text, start_pos, idx):
@@ -464,8 +430,6 @@ def process_pos_blocks(ifn, ofn, chrom):
                 skip_gene = False
                 data = []
 
-                #out.write("* " + gene_name + " " + chrom_num + "\n")
-
             # CDS index
             elif line.startswith("%"):
                 start_pos = int(items[3])
@@ -545,10 +509,7 @@ def process_neg_blocks(ifn, ofn, chrom):
             if line.startswith("*"):
                 gene_name = items[1]                    # extract gene name
                 chrom_num = chrom.replace("chr", "")    # extract chrom number
-                #skip_gene = False
                 data = []
-
-                #out.write("* " + gene_name + " " + chrom_num + "\n")
 
             # CDS index
             elif line.startswith("%"):
@@ -566,7 +527,6 @@ def process_neg_blocks(ifn, ofn, chrom):
 
             # Non-human sequence
             elif line != "\n":
-                #if skip_gene: continue
 
                 # Write corresponding labels string
                 query = line.replace("-", "").replace("N", "")
