@@ -1,0 +1,4 @@
+
+cat chr1.data chr2.data chr3.data chr4.data chr5.data chr6.data chr7.data chr8.data chr9.data chr10.data chr11.data chr12.data  chr13.data chr14.data chr15.data chr16.data chr17.data chr18.data chr19.data chr20.data chr21.data chr22.data > cat_all.data
+
+cat chr1.labels chr2.labels chr3.labels chr4.labels chr5.labels chr6.labels chr7.labels chr8.labels chr9.labels chr10.labels chr11.labels chr12.labels  chr13.labels chr14.labels chr15.labels chr16.labels chr17.labels chr18.labels chr19.labels chr20.labels chr21.labels chr22.labels > cat_all.labels
